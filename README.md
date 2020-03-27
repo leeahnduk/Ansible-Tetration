@@ -20,7 +20,8 @@ $ git clone https://github.com/leeahnduk/Ansible-Tetration.git
 ```
 
 ## Screenshots
-![Example screenshot](https://github.com/leeahnduk/Ansible-Tetration/blob/master/Ansible-CentOS.jpg)
+![Run screenshot](https://github.com/leeahnduk/Ansible-Tetration/blob/master/Ansible-CentOS.jpg)
+![Result screenshot](https://github.com/leeahnduk/Ansible-Tetration/blob/master/Result.jpg)
 
 ## UserGuide
 How to use this application:
@@ -37,7 +38,7 @@ How to use this application:
 * Change Tetration sh filename accordingly.
 * Create Folder in vCenter: Ansible in this example
 * Portgroup in vCenter - For Example Shared: 192.168.33.128/28. in ACI, create EPG for Shared Service portgroup in the same subnet
-    * Tetration-PODs|Shared
+    * Core|Tetration|Tet-Shared
     * myvm_folder="Ansible"
 
 * to run ansible playbook, use command:  `ansible-playbook -i hosts/test deploy.yml`

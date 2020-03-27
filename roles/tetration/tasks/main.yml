@@ -51,9 +51,9 @@
     path: /tmp/tet_agent_installer.sh
     mode: u+x
 
-- name: run installer with proxy enabled
+- name: run installer
   command:
-    cmd: /tmp/tet_agent_installer.sh --proxy=http://proxy.esl.cisco.com:80
+    cmd: sh /tmp/tet_agent_installer.sh
   become: yes
   become_method: sudo
 
@@ -64,8 +64,4 @@
   become: yes
   become_method: sudo
 
-- name: Restart sensor
-  command: systemctl restart tet-sensor
-  become: yes
-  become_method: sudo
 
