@@ -1,0 +1,9 @@
+---
+- name: Install Base
+  hosts: all
+  remote_user: ansible
+
+  roles:
+    - common
+    - { role: ntp-client, tags: ntp }
+    - ssh

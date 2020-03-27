@@ -1,0 +1,4 @@
+---
+  - include: vm-deploy.yml
+  - include: sw-deploy.yml
+  - include: tetration.yml

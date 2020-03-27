@@ -1,0 +1,27 @@
+---
+
+#http_proxy: http://proxy.esl.cisco.com:80
+#no_proxy
+
+sensor_file: /tmp/asean_enforcer_linux.sh
+
+ntp_servers: [
+  "192.168.9.11",
+]
+
+dns_servers: [
+  "192.168.20.2"
+]
+
+vm_vsphere_host: 192.168.20.4
+vm_vsphere_user: administrator@dmz.cisco.demo
+vm_vsphere_password: C1scoUC$
+vm_vsphere_datacenter: SGP
+vm_vsphere_template: CentOS-68-vmx10
+vm_esx_host: hx-2-compute2.cisco.demo
+vm_datastore: Tet
+vm_network: Core|Tetration|Tet-Apps
+vm_cluster_name: HX-2
+vm_memory: 1024
+vm_notes: Created by Ansible
+dumpfacts: false
