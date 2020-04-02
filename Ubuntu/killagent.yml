@@ -1,0 +1,22 @@
+---
+- name: Kill Tetration Agent
+  hosts: all
+  gather_facts: false
+  connection: local
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: Disable installed agent 
+    yum: 
+      name: tet-sensor-site
+      state: removed
+  - name: Delete Tetration User
+    user:
+      name: tet-sensor
+      state: absent
+      remove: yes
+  - shell: "rm -rf /usr/local/tet"
+    become: yes
+    become_method: sudo
+    args:
+      warn: false

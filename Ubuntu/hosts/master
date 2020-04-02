@@ -1,0 +1,7 @@
+#Consolidation of all groups
+[hosts:children]
+master
+
+[master]
+k8s-master ansible_host=192.168.36.23 ansible_port=22 ansible_user=ubuntu
+

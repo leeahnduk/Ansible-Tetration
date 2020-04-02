@@ -5,7 +5,7 @@
   connection: local
   tasks:
     - name: Create VM from template
-      vmware_guest:
+      vsphere_guest:
         validate_certs: False
         vcenter_hostname: "{{ vm_vsphere_host }}"
         username: "{{ vm_vsphere_user }}"
@@ -38,7 +38,7 @@
           memory_mb: "{{ myvm_memory | default(1024) }}"
 
     - name: Reconfigure VM
-      vmware_guest:
+      vsphere_guest:
         validate_certs: False
         vcenter_hostname: "{{ vm_vsphere_host }}"
         username: "{{ vm_vsphere_user }}"
@@ -55,7 +55,7 @@
             network_type: dvs
 
     - name: Power On VM
-      vmware_guest:
+      vsphere_guest:
         validate_certs: False
         vcenter_hostname: "{{ vm_vsphere_host }}"
         username: "{{ vm_vsphere_user }}"

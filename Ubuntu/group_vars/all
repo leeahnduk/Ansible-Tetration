@@ -1,0 +1,27 @@
+---
+
+#http_proxy: http://proxy.esl.cisco.com:80
+#no_proxy
+
+
+ntp_servers: [
+  "192.168.9.11",
+]
+
+dns_servers: [
+  "192.168.20.2"
+]
+
+vm_vsphere_host: 192.168.20.4
+vm_vsphere_user: administrator@dmz.cisco.demo
+vm_vsphere_password: C1scoUC$
+vm_vsphere_datacenter: SGP
+vm_vsphere_template: Ubuntu1804Template
+vm_esx_host: hx-2-compute5.cisco.demo
+vm_datastore: Tet
+vm_network: Core|Tetration|Tet-Ansible
+vm_cluster_name: HX-2
+vm_memory: 1024
+vm_notes: Created by Ansible
+dumpfacts: false
+

@@ -1,0 +1,8 @@
+#Consolidation of all groups
+[hosts:children]
+workers
+
+[workers]
+k8s-worker01 ansible_host=192.168.36.24 ansible_port=22 ansible_user=ubuntu
+k8s-worker02 ansible_host=192.168.36.25 ansible_port=22 ansible_user=ubuntu
+k8s-worker03 ansible_host=192.168.36.26 ansible_port=22 ansible_user=ubuntu
