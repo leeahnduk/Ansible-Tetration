@@ -1,0 +1,140 @@
+---
+- name: Run the kubeadm initialisation on master node
+  hosts: master
+  become: yes
+  tasks:
+    - name: Run the kubeadm initialisation
+      shell: >
+        set -o errexit; \
+        kubeadm init \
+        --config /etc/kubernetes/kubeadminitmaster.yaml
+      args:
+        chdir: $HOME
+
+    - name: create .kube directory
+      become: yes
+      become_user: ubuntu
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+
+    - name: copy admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/ubuntu/.kube/config
+        remote_src: yes
+        owner: ubuntu
+
+    - name: install Pod network
+      become: yes
+      become_user: ubuntu
+      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
+      args:
+        chdir: $HOME
+        creates: pod_network_setup.txt
+
+    - name: Export the master node config
+      shell: "sudo kubectl -n kube-public get configmap cluster-info -o jsonpath='{.data.kubeconfig}' > discovery.yaml"
+      args:
+        chdir: $HOME
+
+- name: Install Tetration agents on K8s Master Node
+  hosts: master
+  tasks:
+    - name: perform apt-get update and update the cache
+      become: yes
+      apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400
+
+    - name: install linux packages
+      become: yes
+      apt:
+        name: ['rpm', 'lsb-release', 'ipset', 'dmidecode', 'gawk', 'util-linux', 'curl', 'openssl', 'sed', 'alien']
+        state: present
+
+    - name: Download Cisco Tetration Enforcer agent
+      become: yes
+      get_url:
+        url: http://192.168.20.100/tet-sensor-3.3.2.2-1.u18-tet.enforcer.x86_64.rpm
+        dest: /opt
+        mode: 0755
+        #group: admin
+        #owner: admin
+
+    - name: Run alien to convert rpm to debian package
+      become: yes
+      shell: alien /opt/tet-sensor-3.3.2.2-1.u18-tet.enforcer.x86_64.rpm --scripts
+      args:
+        chdir: /opt
+
+    - name: Install converted tetration debian package
+      become: yes
+      register: install
+      apt:
+        deb: /opt/tet-sensor-site_3.3.2.2-2_amd64.deb
+
+- name: Generate openSSL key, certificate signing request, and self-signed certificate
+  hosts: master
+  become: yes
+
+  tasks:
+    - name: generate openSSL key
+      when: install is succeeded
+      openssl_privatekey:
+        path: /etc/kubernetes/pki/tetration.key
+        size: 2048
+
+    - name: generate openSSL certificate signing request
+      openssl_csr:
+        path: /etc/kubernetes/pki/tetration.csr
+        privatekey_path: /etc/kubernetes/pki/tetration.key
+        country_name: SG
+        organization_name: tetration
+        email_address: anhdle@cisco.com
+        common_name: tetration
+
+    - name: generate a self-signed openSSL certificate
+      openssl_certificate:
+        path: /etc/kubernetes/pki/tetration.crt
+        csr_path: /etc/kubernetes/pki/tetration.csr
+        ownca_path: /etc/kubernetes/pki/ca.crt
+        ownca_privatekey_path: /etc/kubernetes/pki/ca.key
+        provider: ownca
+      register: init_cert_master
+
+- name: setup kubernetes credentials on master node
+  hosts: master
+  become: yes
+
+  tasks:
+    - name: run kuberctl config set-credentials
+      when: init_cert_master is succeeded
+      shell: >
+        set -o errexit; \
+        kubectl config set-credentials tetration \
+          --client-certificate=/etc/kubernetes/pki/tetration.crt \
+          --client-key=/etc/kubernetes/pki/tetration.key
+      args:
+        executable: /bin/bash
+
+    - name: run kubectl config set-context
+      shell: >
+        set -o errexit; \
+        kubectl config set-context tetration@kubernetes \
+          --cluster=kubernetes \
+          --user=tetration
+      args:
+        executable: /bin/bash
+
+    - name: run kubectl cluster role binding
+      shell: >
+        set -o errexit; \
+        kubectl create clusterrolebinding tetration-cluster-admin \
+          --clusterrole=cluster-admin \
+          --group=tetration
+      args:
+        executable: /bin/bash
+
