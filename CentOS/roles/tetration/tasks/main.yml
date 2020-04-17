@@ -43,7 +43,7 @@
   become: yes
   become_method: sudo
 
-- name: Copy RPM
+- name: Copy shell scripts
   copy: src={{ sensor_file }} dest=/tmp/tet_agent_installer.sh
 
 - name: enable execute
