@@ -35,10 +35,12 @@
         creates: pod_network_setup.txt
 
     - name: Export the master node config
-      shell: "sudo kubectl -n kube-public get configmap cluster-info -o jsonpath='{.data.kubeconfig}' > discovery.yaml"
+      become: yes
+      become_user: ubuntu
+      shell: kubectl -n kube-public get configmap cluster-info -o jsonpath='{.data.kubeconfig}' > discovery.yaml
       args:
-        chdir: $HOME
-
+        executable: /bin/bash
+        
 - name: Install Tetration agents on K8s Master Node
   hosts: master
   tasks:
